@@ -1,0 +1,39 @@
+#include "Adafruit_DHT.h"
+#define DHTPIN 5    
+#define DHTTYPE DHT11		
+
+
+DHT dht1(DHTPIN,DHTTYPE);
+
+int check = 0;
+int cycle = 60000;
+int temperature = 0;
+int store = 0;
+
+
+void setup()
+{
+  Serial.begin(9600);
+  Particle.variable("Temperature",store);
+}
+
+void loop()
+{
+    int temperature = int(dht1.getTempFarenheit());
+    
+    if (temperature < 100 && temperature > 20)
+    {
+        store = temperature;
+    }
+    
+       
+    if (millis() - check > cycle)
+    {
+        Particle.publish("Temperature",String(store));
+        check = millis();
+    }
+    
+    
+    Serial.println(store);
+    delay(100);
+}
